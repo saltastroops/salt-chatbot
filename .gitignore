@@ -3,5 +3,5 @@
 
 
 # Local data files
-/chroma_db
+/*/**/chroma_db
 /.env
