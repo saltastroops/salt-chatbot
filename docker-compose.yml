@@ -10,3 +10,14 @@ services:
       - "8000:8000"
     volumes:
       - ./chroma_db:/app/chroma_db/
+      - /Users/saaoit/IdeaProjects/salt-cfp-llm-chatbot/data/ProposalCall.html:/Users/saaoit/IdeaProjects/salt-cfp-llm-chatbot/data/ProposalCall.html
+
+  chatbot_frontend:
+    build:
+      context: ./chatbot_frontend
+    env_file:
+      - .env
+    depends_on:
+      - chatbot_api
+    ports:
+      - "8501:8501"
