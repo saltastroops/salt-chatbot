@@ -16,6 +16,8 @@ CHROMA_PORT = os.getenv("CHROMA_PORT")
 CHROMA_COLLECTION_NAME = os.getenv("CHROMA_COLLECTION_NAME")
 CHROMA_DATA_DIR = os.getenv("CHROMA_DATA_DIR")
 
+SUMMARIES_DOCS = os.getenv("SUMMARIES_DOCS")
+
 DOCUMENT_PATH = os.getenv("DOCUMENT_PATH")
 
 logging.basicConfig(
@@ -43,23 +45,27 @@ else:
     headers = [doc.metadata["header"] for doc in chunked_documents]
     links = [doc.metadata["link"] for doc in chunked_documents]
 
-    LOGGER.info(msg="Generating summaries of the page content...")
-    text_summaries, _ = generate_text_summaries(
-        texts, [], summarize_texts=True
-    )
+    if SUMMARIES_DOCS:
 
-    LOGGER.info(msg="Adding summarized documents to the vectorstore...")
-    summary_docs = [
-        Document(page_content=s, metadata={
-            "doc_id": doc_ids[i],
-            "header": headers[i],
-            "link": links[i],
-        })
-        for i, s in enumerate(text_summaries)
-    ]
+        LOGGER.info(msg="Generating summaries of the page content...")
+        text_summaries, _ = generate_text_summaries(
+            texts, [], summarize_texts=True
+        )
 
+        summary_docs = [
+            Document(page_content=s, metadata={
+                "doc_id": doc_ids[i],
+                "header": headers[i],
+                "link": links[i],
+            })
+            for i, s in enumerate(text_summaries)
+        ]
+
+        chunked_documents = summary_docs
+
+    LOGGER.info(msg="Adding documents to the vectorstore...")
     db = Chroma.from_documents(
-        documents=summary_docs,
+        documents=chunked_documents,
         collection_name=CHROMA_COLLECTION_NAME,
         persist_directory=CHROMA_DATA_DIR,
         embedding=embeddings
