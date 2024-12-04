@@ -45,8 +45,7 @@ else:
     headers = [doc.metadata["header"] for doc in chunked_documents]
     links = [doc.metadata["link"] for doc in chunked_documents]
 
-    if SUMMARIES_DOCS:
-
+    if SUMMARIES_DOCS.lower() == "true":
         LOGGER.info(msg="Generating summaries of the page content...")
         text_summaries, _ = generate_text_summaries(
             texts, [], summarize_texts=True
